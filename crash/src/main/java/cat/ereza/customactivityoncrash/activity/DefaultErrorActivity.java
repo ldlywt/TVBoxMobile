@@ -44,13 +44,13 @@ public final class DefaultErrorActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //This is needed to avoid a crash if the developer has not specified
-        //an app-level theme that extends Theme.AppCompat
-        TypedArray a = obtainStyledAttributes(R.styleable.AppCompatTheme);
-        if (!a.hasValue(R.styleable.AppCompatTheme_windowActionBar)) {
-            setTheme(R.style.Theme_AppCompat_Light_DarkActionBar);
-        }
-        a.recycle();
+//        //This is needed to avoid a crash if the developer has not specified
+//        //an app-level theme that extends Theme.AppCompat
+//        TypedArray a = obtainStyledAttributes(R.styleable.AppCompatTheme);
+//        if (!a.hasValue(R.styleable.AppCompatTheme_windowActionBar)) {
+//            setTheme(R.style.Theme_AppCompat_Light_DarkActionBar);
+//        }
+//        a.recycle();
 
         setContentView(R.layout.customactivityoncrash_default_error_activity);
 

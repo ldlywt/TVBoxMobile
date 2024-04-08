@@ -87,7 +87,9 @@ public class PlayerHelper {
                 renderViewFactory = SurfaceRenderViewFactory.create();
                 break;
         }
-        videoView.setPlayerFactory(playerFactory);
+        if (videoView != null && playerFactory != null) {
+            videoView.setPlayerFactory(playerFactory);
+        }
         videoView.setRenderViewFactory(renderViewFactory);
         videoView.setScreenScaleType(scale);
     }
