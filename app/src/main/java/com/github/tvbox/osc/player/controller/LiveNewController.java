@@ -5,6 +5,7 @@ import android.view.MotionEvent;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.github.tvbox.osc.R;
 
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  */
 
 public class LiveNewController extends BaseController {
-    protected ProgressBar mLoading;
+    protected LottieAnimationView mLoading;
     private int minFlingDistance = 100;             //最小识别距离
     private int minFlingVelocity = 10;              //最小识别速度
 

@@ -21,7 +21,6 @@ public class MyFragment extends BaseVbFragment<FragmentMyBinding> {
 
     @Override
     protected void init() {
-        mBinding.tvVersion.setText("v" + AppUtils.getAppVersionName());
 
         mBinding.tvLive.setOnClickListener(v -> jumpActivity(LiveActivity.class));
 

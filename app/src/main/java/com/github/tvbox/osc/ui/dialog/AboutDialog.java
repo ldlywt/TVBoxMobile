@@ -2,9 +2,11 @@ package com.github.tvbox.osc.ui.dialog;
 
 import android.content.Context;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.blankj.utilcode.util.AppUtils;
 import com.github.tvbox.osc.R;
 import com.lxj.xpopup.core.BottomPopupView;
 
@@ -30,5 +32,7 @@ public class AboutDialog extends BottomPopupView {
                 dismiss();
             }
         });
+
+        ((TextView) findViewById(R.id.tv_version)).setText("v" + AppUtils.getAppVersionName());
     }
 }

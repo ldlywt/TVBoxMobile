@@ -43,9 +43,20 @@ public class GridAdapter extends BaseQuickAdapter<Movie.Video, BaseViewHolder> {
 
         if (TextUtils.isEmpty(item.note)) {
             helper.setVisible(R.id.tvNote, false);
+            helper.setVisible(R.id.sl_note, false);
         } else {
-            helper.setVisible(R.id.tvNote, true);
-            helper.setText(R.id.tvNote, item.note);
+            if (item.note.contains("评分：")) {
+                String value = item.note.split("评分：")[1];
+                if (!value.equals("0")) {
+                    helper.setVisible(R.id.tvNote, true);
+                    helper.setText(R.id.tvNote, value);
+                    helper.setVisible(R.id.sl_note, true);
+                } else {
+                    helper.setVisible(R.id.sl_note, false);
+                }
+            } else {
+                helper.setVisible(R.id.sl_note, false);
+            }
         }
         helper.setText(R.id.tvName, item.name);
         ImageView ivThumb = helper.getView(R.id.ivThumb);

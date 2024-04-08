@@ -18,9 +18,11 @@
             android:scaleType="centerCrop" />
 
         <com.lihang.ShadowLayout
+            android:id="@+id/sl_note"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:hl_cornerRadius_rightBottom="8dp"
+            android:visibility="gone"
             app:hl_layoutBackground="@color/color_1890FF">
 
             <TextView

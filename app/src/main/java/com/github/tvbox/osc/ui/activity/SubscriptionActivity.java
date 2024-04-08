@@ -46,7 +46,7 @@ public class SubscriptionActivity extends BaseVbActivity<ActivitySubscriptionBin
 
     /**
      * 单线路格式
-     * "http://top啊啊啊阿萨啊/duo"
+     * "http://www.饭太硬.top/"
      * <p>
      * 多线路格式
      * {
