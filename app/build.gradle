@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId 'com.github.tvbox.osc'
-        minSdkVersion 24
+        minSdkVersion 26
         targetSdkVersion 33
         versionCode 30
         versionName '1.0.0'
@@ -32,7 +32,7 @@ android {
 
         // Apk 输出配置
         variant.outputs.all { output ->
-            outputFileName = 'MBox_v' + variant.versionName + '_' + variant.buildType.name
+            outputFileName = 'mango_v' + variant.versionName + '_' + variant.buildType.name
             if (variant.buildType.name == buildTypes.release.getName()) {
                 outputFileName += '_' + new Date().format("yyyyMMdd")
             }
@@ -47,10 +47,10 @@ android {
 
     signingConfigs {
         config {
-            keyAlias 'key0'
-            keyPassword '123456'
-            storeFile file('test.jks')
-            storePassword '123456'
+            keyAlias 'notekeystore'
+            keyPassword 'wutao#2022'
+            storeFile file('wtKeyStore.jks')
+            storePassword 'wutao#2022'
             v1SigningEnabled true
             v2SigningEnabled true
         }
@@ -66,7 +66,7 @@ android {
         release {
             signingConfig signingConfigs.config
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            minifyEnabled true
+            minifyEnabled false
         }
     }
 
@@ -97,14 +97,14 @@ android {
 dependencies {
     api fileTree(dir: "libs", include: ['*.jar', '*.aar'])
 
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.6.1'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.22"
     implementation 'androidx.core:core-ktx:1.8.0'
 
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation 'com.google.zxing:core:3.4.1'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
@@ -161,8 +161,8 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 
     //tab标题栏
-    implementation project(":TabLayout")
-    implementation project(':ViewPager1Delegate')
+//    implementation project(":TabLayout")
+//    implementation project(':ViewPager1Delegate')
     //TabLayout的非kt项目需要依赖这个包实现点击事件等
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     //展开收缩tv
@@ -177,4 +177,7 @@ dependencies {
     implementation 'com.github.devin1014.DLNA-Cast:dlna-dmc:V1.0.0'
 
     implementation "androidx.core:core-splashscreen:1.0.1"
+
+    implementation 'com.github.angcyo.DslTablayout:TabLayout:3.5.5'
+    implementation 'com.github.angcyo.DslTablayout:ViewPager1Delegate:3.5.5'
 }
