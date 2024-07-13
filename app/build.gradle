@@ -6,7 +6,7 @@ android {
     compileSdk = 33
 
     defaultConfig {
-        applicationId 'com.ldlywt.lvideo'
+        applicationId 'com.ldlywt.video'
         minSdkVersion 26
         targetSdkVersion 33
         versionCode 30
