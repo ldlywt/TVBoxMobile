@@ -6,7 +6,7 @@ android {
     compileSdk = 33
 
     defaultConfig {
-        applicationId 'com.github.tvbox.osc'
+        applicationId 'com.ldlywt.lvideo'
         minSdkVersion 26
         targetSdkVersion 33
         versionCode 30
@@ -32,7 +32,7 @@ android {
 
         // Apk 输出配置
         variant.outputs.all { output ->
-            outputFileName = 'mango_v' + variant.versionName + '_' + variant.buildType.name
+            outputFileName = 'LightVideo' + variant.versionName + '_' + variant.buildType.name
             if (variant.buildType.name == buildTypes.release.getName()) {
                 outputFileName += '_' + new Date().format("yyyyMMdd")
             }

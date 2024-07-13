@@ -1,7 +1,14 @@
 package com.github.tvbox.osc.ui.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.text.TextUtils;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.annotation.NonNull;
+
 import com.blankj.utilcode.util.ClipboardUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -15,6 +22,7 @@ import com.github.tvbox.osc.ui.dialog.ChooseSourceDialog;
 import com.github.tvbox.osc.ui.dialog.SubsTipDialog;
 import com.github.tvbox.osc.ui.dialog.SubsciptionDialog;
 import com.github.tvbox.osc.util.HawkConfig;
+import com.github.tvbox.osc.util.PickUtils;
 import com.github.tvbox.osc.util.Utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -43,6 +51,16 @@ public class SubscriptionActivity extends BaseVbActivity<ActivitySubscriptionBin
     private List<Subscription> mSubscriptions;
     private SubscriptionAdapter mSubscriptionAdapter;
     private List<Source> mSources = new ArrayList<>();
+
+    private ActivityResultLauncher<Boolean> launcher = registerForActivityResult(new ResultContract(), result -> {
+        if (result == null) {
+            return;
+        }
+        Uri uri = result.getData();
+        //文件路径
+        String mFilePath = PickUtils.getPath(SubscriptionActivity.this, uri);
+        addLocalFile(new File(mFilePath));
+    });
 
     /**
      * 单线路格式
@@ -97,7 +115,7 @@ public class SubscriptionActivity extends BaseVbActivity<ActivitySubscriptionBin
                     .autoFocusEditText(false)
                     .asCustom(new SubsciptionDialog(this, "订阅: " + (mSubscriptions.size() + 1), new SubsciptionDialog.OnSubsciptionListener() {
                         @Override
-                        public void onConfirm(String name, String url,boolean checked) {//只有addSub2List用到,看注释,单线路才生效,其余方法仅作为参数继续传递
+                        public void onConfirm(String name, String url, boolean checked) {//只有addSub2List用到,看注释,单线路才生效,其余方法仅作为参数继续传递
                             for (Subscription item : mSubscriptions) {
                                 if (item.getUrl().equals(url)) {
                                     ToastUtils.showLong("订阅地址与" + item.getName() + "相同");
@@ -109,11 +127,12 @@ public class SubscriptionActivity extends BaseVbActivity<ActivitySubscriptionBin
 
                         @Override
                         public void chooseLocal(boolean checked) {//本地导入
-                            if (!XXPermissions.isGranted(mContext, Permission.MANAGE_EXTERNAL_STORAGE)) {
-                                showPermissionTipPopup(checked);
-                            } else {
-                                pickFile(checked);
-                            }
+//                            if (!XXPermissions.isGranted(mContext, "android.permission.MANAGE_EXTERNAL_STORAGE")) {
+//                                showPermissionTipPopup(checked);
+//                            } else {
+//                                pickFile(checked);
+//                            }
+                            launcher.launch(true);
                         }
                     })).show();
         });
@@ -167,10 +186,10 @@ public class SubscriptionActivity extends BaseVbActivity<ActivitySubscriptionBin
                                         .asInputConfirm("更改为", "", item.getName(), "新的订阅名", new OnInputConfirmListener() {
                                             @Override
                                             public void onConfirm(String text) {
-                                                if (!TextUtils.isEmpty(text)){
-                                                    if (text.trim().length()>8){
+                                                if (!TextUtils.isEmpty(text)) {
+                                                    if (text.trim().length() > 8) {
                                                         ToastUtils.showShort("不要过长,不方便记忆");
-                                                    }else {
+                                                    } else {
                                                         item.setName(text.trim());
                                                         mSubscriptionAdapter.notifyItemChanged(position);
                                                     }
@@ -188,64 +207,18 @@ public class SubscriptionActivity extends BaseVbActivity<ActivitySubscriptionBin
         });
     }
 
-    private void showPermissionTipPopup(boolean checked) {
-        new XPopup.Builder(SubscriptionActivity.this)
-                .isDarkTheme(Utils.isDarkTheme())
-                .asConfirm("提示", "这将访问您设备文件的读取权限", () -> {
-                    XXPermissions.with(this)
-                            .permission(Permission.MANAGE_EXTERNAL_STORAGE)
-                            .request(new OnPermissionCallback() {
-                                @Override
-                                public void onGranted(List<String> permissions, boolean all) {
-                                    if (all) {
-                                        pickFile(checked);
-                                    } else {
-                                        ToastUtils.showLong("部分权限未正常授予,请授权");
-                                    }
-                                }
-
-                                @Override
-                                public void onDenied(List<String> permissions, boolean never) {
-                                    if (never) {
-                                        ToastUtils.showLong("读写文件权限被永久拒绝，请手动授权");
-                                        // 如果是被永久拒绝就跳转到应用权限系统设置页面
-                                        XXPermissions.startPermissionActivity(SubscriptionActivity.this, permissions);
-                                    } else {
-                                        ToastUtils.showShort("获取权限失败");
-                                        showPermissionTipPopup(checked);
-                                    }
-                                }
-                            });
-                }).show();
+    private void addLocalFile(File pathFile) {
+        String clanPath = pathFile.getAbsolutePath().replace("/storage/emulated/0", "clan://localhost");
+        for (Subscription item : mSubscriptions) {
+            if (item.getUrl().equals(clanPath)) {
+                ToastUtils.showLong("订阅地址与" + item.getName() + "相同");
+                return;
+            }
+        }
+        addSubscription(pathFile.getName(), clanPath, true);
     }
 
-    /**
-     *
-     * @param checked 与showPermissionTipPopup一样,只记录并传递选中状态
-     */
-    private void pickFile(boolean checked) {
-        new ChooserDialog(SubscriptionActivity.this,R.style.FileChooser)
-                .withFilter(false, false, "txt", "json")
-                .withStartFile(TextUtils.isEmpty(Hawk.get("before_selected_path"))?"/storage/emulated/0/Download":Hawk.get("before_selected_path"))
-                .withChosenListener(new ChooserDialog.Result() {
-                    @Override
-                    public void onChoosePath(String path, File pathFile) {
-                        Hawk.put("before_selected_path",pathFile.getParent());
-                        String clanPath = pathFile.getAbsolutePath().replace("/storage/emulated/0", "clan://localhost");
-                        for (Subscription item : mSubscriptions) {
-                            if (item.getUrl().equals(clanPath)) {
-                                ToastUtils.showLong("订阅地址与" + item.getName() + "相同");
-                                return;
-                            }
-                        }
-                        addSubscription(pathFile.getName(), clanPath,checked);
-                    }
-                })
-                .build()
-                .show();
-    }
-
-    private void addSubscription(String name, String url,boolean checked) {
+    private void addSubscription(String name, String url, boolean checked) {
         if (url.startsWith("clan://")) {
             addSub2List(name, url, checked);
             mSubscriptionAdapter.setNewData(mSubscriptions);
@@ -263,7 +236,7 @@ public class SubscriptionActivity extends BaseVbActivity<ActivitySubscriptionBin
                                 // 多仓?
                                 JsonElement storeHouse = json.get("storeHouse");
                                 if (urls != null && urls.isJsonArray()) {// 多线路
-                                    if (checked){
+                                    if (checked) {
                                         ToastUtils.showLong("多条线路请主动选择");
                                     }
                                     JsonArray urlList = urls.getAsJsonArray();
@@ -294,7 +267,7 @@ public class SubscriptionActivity extends BaseVbActivity<ActivitySubscriptionBin
                                         new XPopup.Builder(SubscriptionActivity.this)
                                                 .asCustom(new ChooseSourceDialog(SubscriptionActivity.this, mSources, (position, url1) -> {
                                                     // 再根据多线路格式获取配置,如果仓内是正常多线路模式,name没用,直接使用线路的命名
-                                                    addSubscription(mSources.get(position).getSourceName(), mSources.get(position).getSourceUrl(),checked);
+                                                    addSubscription(mSources.get(position).getSourceName(), mSources.get(position).getSourceUrl(), checked);
                                                 }))
                                                 .show();
                                     }
@@ -326,20 +299,21 @@ public class SubscriptionActivity extends BaseVbActivity<ActivitySubscriptionBin
 
     /**
      * 仅当选中本地文件和添加的为单线路时,使用此订阅生效。多线路会直接解析全部并添加,多仓会展开并选择,最后也按多线路处理,直接添加
+     *
      * @param name
      * @param url
      * @param checkNewest
      */
-    private void addSub2List(String name,String url,boolean checkNewest){
-        if (checkNewest){//选中最新的,清除以前的选中订阅
+    private void addSub2List(String name, String url, boolean checkNewest) {
+        if (checkNewest) {//选中最新的,清除以前的选中订阅
             for (Subscription subscription : mSubscriptions) {
-                if (subscription.isChecked()){
+                if (subscription.isChecked()) {
                     subscription.setChecked(false);
                 }
             }
             mSelectedUrl = url;
             mSubscriptions.add(new Subscription(name, url).setChecked(true));
-        }else {
+        } else {
             mSubscriptions.add(new Subscription(name, url).setChecked(false));
         }
     }
@@ -362,4 +336,22 @@ public class SubscriptionActivity extends BaseVbActivity<ActivitySubscriptionBin
         }
         super.finish();
     }
+
+    private static class ResultContract extends ActivityResultContract<Boolean, Intent> {
+        @NonNull
+        @Override
+        public Intent createIntent(@NonNull Context context, Boolean input) {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("application/json");  // 设置选择文件的类型为JSON文件
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            //  Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            return intent;
+        }
+
+        @Override
+        public Intent parseResult(int resultCode, Intent intent) {
+            return intent;
+        }
+    }
+
 }
