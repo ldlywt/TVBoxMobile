@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context=".ui.activity.SubscriptionActivity">
+    tools:context="com.ldlywt.video.osc.ui.activity.SubscriptionActivity">
 
     <com.hjq.bar.TitleBar
         android:id="@+id/title_bar"

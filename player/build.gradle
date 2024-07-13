@@ -4,7 +4,7 @@ plugins {
 
 android {
     compileSdkVersion 31
-    namespace = "com.github.tvbox.osc.player"
+    namespace = "com.ldlywt.video.osc.player"
     defaultConfig {
         minSdkVersion 26
         targetSdkVersion 33

@@ -480,7 +480,7 @@
 					android:scaleType="centerInside" />
 
 			</FrameLayout>
-		<com.github.tvbox.osc.ui.tv.widget.MarqueeTextView
+		<com.ldlywt.video.osc.ui.tv.widget.MarqueeTextView
 			android:id="@+id/tv_channel_bar_name"
 			android:layout_width="@dimen/dp_200"
 			android:layout_height="wrap_content"
@@ -516,7 +516,7 @@
 			android:gravity="center"
 			android:text=""
 			android:textColor="@color/color_FFFFFF" />
-		<com.github.tvbox.osc.ui.tv.widget.MarqueeTextView
+		<com.ldlywt.video.osc.ui.tv.widget.MarqueeTextView
 
 			android:textColor="@color/color_FFFFFF"
 			android:ellipsize="marquee"
@@ -528,7 +528,7 @@
 			android:layout_toRightOf="@+id/tv_current_program"
 			android:layout_alignTop="@+id/tv_current_program" />
 
-		<com.github.tvbox.osc.ui.tv.widget.MarqueeTextView
+		<com.ldlywt.video.osc.ui.tv.widget.MarqueeTextView
 			android:id="@+id/tv_current_program_name"
 			android:layout_width="180dp"
 			android:layout_height="wrap_content"
@@ -565,7 +565,7 @@
 			android:layout_alignLeft="@+id/tv_current_program"
 			android:layout_alignBottom="@+id/view_line"
 			android:layout_alignParentBottom="true" />
-		<com.github.tvbox.osc.ui.tv.widget.MarqueeTextView
+		<com.ldlywt.video.osc.ui.tv.widget.MarqueeTextView
 			android:textColor="@color/color_FFFFFF"
 			android:id="@+id/tv_next_program_time"
 			android:layout_width="wrap_content"
@@ -576,7 +576,7 @@
 			android:layout_toRightOf="@+id/tv_next_program"
 			android:layout_alignTop="@+id/tv_next_program" />
 
-		<com.github.tvbox.osc.ui.tv.widget.MarqueeTextView
+		<com.ldlywt.video.osc.ui.tv.widget.MarqueeTextView
 			android:id="@+id/tv_next_program_name"
 			android:layout_width="180dp"
 			android:layout_height="wrap_content"
@@ -735,7 +735,7 @@
 			android:layout_alignEnd="@+id/iv_circle_bg"
 			android:layout_alignBottom="@+id/iv_circle_bg" />
 
-		<com.github.tvbox.osc.ui.tv.widget.MarqueeTextView
+		<com.ldlywt.video.osc.ui.tv.widget.MarqueeTextView
 			android:id="@+id/tv_right_top_channel_name"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
