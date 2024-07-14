@@ -70,9 +70,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
     private TextView tvRender;
     private TextView tvScale;
     private TextView tvDns;
-    private TextView tvHomeRec;
     private TextView tvHistoryNum;
-    private TextView tvFastSearchText;
     TextView tvLongPressSpeed;
 
     public static ModelSettingFragment newInstance() {
@@ -95,9 +93,6 @@ public class ModelSettingFragment extends BaseLazyFragment {
             SettingActivity activity = (SettingActivity) mActivity;
             activity.onBackPressed();
         });
-        tvFastSearchText = findViewById(R.id.showFastSearchText);
-        tvFastSearchText.setText(Hawk.get(HawkConfig.FAST_SEARCH_MODE, false) ? "已开启" : "已关闭");
-
         tvDebugOpen = findViewById(R.id.tvDebugOpen);
         tvParseWebView = findViewById(R.id.tvParseWebView);
         tvMediaCodec = findViewById(R.id.tvMediaCodec);
@@ -106,15 +101,11 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvScale = findViewById(R.id.tvScaleType);
 
         tvDns = findViewById(R.id.tvDns);
-        tvHomeRec = findViewById(R.id.tvHomeRec);
         tvHistoryNum = findViewById(R.id.tvHistoryNum);
 
         tvMediaCodec.setText(Hawk.get(HawkConfig.IJK_CODEC, ""));
         tvDebugOpen.setText(Hawk.get(HawkConfig.DEBUG_OPEN, false) ? "已打开" : "已关闭");
         tvParseWebView.setText(Hawk.get(HawkConfig.PARSE_WEBVIEW, true) ? "系统自带" : "XWalkView");
-
-        tvDns.setText(OkGoHelper.dnsHttpsList.get(Hawk.get(HawkConfig.DOH_URL, 0)));
-        tvHomeRec.setText(getHomeRecName(Hawk.get(HawkConfig.HOME_REC, 0)));
         tvHistoryNum.setText(HistoryHelper.getHistoryNumName(Hawk.get(HawkConfig.HISTORY_NUM, 0)));
         tvScale.setText(PlayerHelper.getScaleName(Hawk.get(HawkConfig.PLAY_SCALE, 0)));
         tvPlay.setText(PlayerHelper.getPlayerName(Hawk.get(HawkConfig.PLAY_TYPE, 0)));
@@ -470,42 +461,6 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.show();
             }
         });
-        findViewById(R.id.llHomeRec).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FastClickCheckUtil.check(v);
-                int defaultPos = Hawk.get(HawkConfig.HOME_REC, 2);
-                ArrayList<Integer> types = new ArrayList<>();
-                types.add(0);
-                types.add(1);
-                types.add(2);
-                SelectDialog<Integer> dialog = new SelectDialog<>(mActivity);
-                dialog.setTip("主页内容显示");
-                dialog.setAdapter(new SelectDialogAdapter.SelectDialogInterface<Integer>() {
-                    @Override
-                    public void click(Integer value, int pos) {
-                        Hawk.put(HawkConfig.HOME_REC, value);
-                        tvHomeRec.setText(getHomeRecName(value));
-                    }
-
-                    @Override
-                    public String getDisplay(Integer val) {
-                        return getHomeRecName(val);
-                    }
-                }, new DiffUtil.ItemCallback<Integer>() {
-                    @Override
-                    public boolean areItemsTheSame(@NonNull @NotNull Integer oldItem, @NonNull @NotNull Integer newItem) {
-                        return oldItem.intValue() == newItem.intValue();
-                    }
-
-                    @Override
-                    public boolean areContentsTheSame(@NonNull @NotNull Integer oldItem, @NonNull @NotNull Integer newItem) {
-                        return oldItem.intValue() == newItem.intValue();
-                    }
-                }, types, defaultPos);
-                dialog.show();
-            }
-        });
         SettingActivity.callback = new SettingActivity.DevModeCallback() {
             @Override
             public void onChange() {
@@ -549,71 +504,6 @@ public class ModelSettingFragment extends BaseLazyFragment {
                 dialog.show();
             }
         });
-        findViewById(R.id.showFastSearch).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FastClickCheckUtil.check(v);
-                Hawk.put(HawkConfig.FAST_SEARCH_MODE, !Hawk.get(HawkConfig.FAST_SEARCH_MODE, false));
-                tvFastSearchText.setText(Hawk.get(HawkConfig.FAST_SEARCH_MODE, false) ? "已开启" : "已关闭");
-            }
-        });
-
-        findViewById(R.id.llSearchTv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FastClickCheckUtil.check(view);
-                loadingSearchRemoteTvDialog = new SearchRemoteTvDialog(mActivity);
-                EventBus.getDefault().register(loadingSearchRemoteTvDialog);
-                loadingSearchRemoteTvDialog.setTip("搜索附近TVBox");
-                loadingSearchRemoteTvDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialogInterface) {
-                        EventBus.getDefault().unregister(loadingSearchRemoteTvDialog);
-                    }
-                });
-                loadingSearchRemoteTvDialog.show();
-
-                RemoteTVBox tv = new RemoteTVBox();
-                remoteTvHostList = new ArrayList<>();
-                foundRemoteTv = false;
-                view.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                RemoteTVBox.searchAvalible(tv.new Callback() {
-                                    @Override
-                                    public void found(String viewHost, boolean end) {
-                                        remoteTvHostList.add(viewHost);
-                                        if (end) {
-                                            foundRemoteTv = true;
-                                            EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_SETTING_SEARCH_TV));
-                                        }
-                                    }
-
-                                    @Override
-                                    public void fail(boolean all, boolean end) {
-                                        if (end) {
-                                            if (all) {
-                                                foundRemoteTv = false;
-                                            } else {
-                                                foundRemoteTv = true;
-                                            }
-                                            EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_SETTING_SEARCH_TV));
-                                        }
-                                    }
-                                });
-                            }
-                        }).start();
-
-                    }
-                }, 500);
-
-
-            }
-        });
 
         findViewById(R.id.llClearCache).setOnClickListener((view -> {
             new XPopup.Builder(mActivity)
@@ -622,70 +512,6 @@ public class ModelSettingFragment extends BaseLazyFragment {
                         onClickClearCache(view);
                     }).show();
         }));
-
-        View theme = findViewById(R.id.llTheme);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            theme.setVisibility(View.GONE);
-        }
-        int oldTheme = Hawk.get(HawkConfig.THEME_TAG, 0);
-        String[] themes = {"跟随系统", "浅色", "深色"};
-        TextView tvTheme = findViewById(R.id.tvTheme);
-        tvTheme.setText(themes[oldTheme]);
-        theme.setOnClickListener((view -> {
-            FastClickCheckUtil.check(view);
-            ArrayList<Integer> types = new ArrayList<>();
-            types.add(0);
-            types.add(1);
-            types.add(2);
-            SelectDialog<Integer> dialog = new SelectDialog<>(mActivity);
-            dialog.setTip("请选择");
-            dialog.setAdapter(new SelectDialogAdapter.SelectDialogInterface<Integer>() {
-                @Override
-                public void click(Integer value, int pos) {
-                    tvTheme.setText(themes[value]);
-                    Hawk.put(HawkConfig.THEME_TAG, value);
-                }
-
-                @Override
-                public String getDisplay(Integer val) {
-                    return themes[val];
-                }
-            }, new DiffUtil.ItemCallback<Integer>() {
-                @Override
-                public boolean areItemsTheSame(@NonNull @NotNull Integer oldItem, @NonNull @NotNull Integer newItem) {
-                    return oldItem.intValue() == newItem.intValue();
-                }
-
-                @Override
-                public boolean areContentsTheSame(@NonNull @NotNull Integer oldItem, @NonNull @NotNull Integer newItem) {
-                    return oldItem.intValue() == newItem.intValue();
-                }
-            }, types, oldTheme);
-            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    if (oldTheme != Hawk.get(HawkConfig.THEME_TAG, 0)) {
-                        Utils.initTheme();
-                        Bundle bundle = new Bundle();
-                        bundle.putBoolean("useCache", true);
-                        jumpActivity(MainActivity.class, bundle);
-                    }
-                }
-            });
-            dialog.show();
-        }));
-
-//        findViewById(R.id.llTMDB).setVisibility(BuildConfig.DEBUG?View.VISIBLE:View.GONE);
-        findViewById(R.id.llTMDB).setOnClickListener(view -> {
-            String token = Hawk.get(HawkConfig.TOKEN_TMDB, "");
-            new XPopup.Builder(mActivity)
-                    .asInputConfirm("IMDB", "", token, "请录入token,不必带Bearer", text -> {
-                        if (!TextUtils.isEmpty(text)) {
-                            Hawk.put(HawkConfig.TOKEN_TMDB, text);
-                            ToastUtils.showShort("设置成功");
-                        }
-                    }, null, R.layout.dialog_input).show();
-        });
 
         SwitchMaterial switchVideoPurify = findViewById(R.id.switchVideoPurify);
         switchVideoPurify.setChecked(Hawk.get(HawkConfig.VIDEO_PURIFY, true));
@@ -733,16 +559,4 @@ public class ModelSettingFragment extends BaseLazyFragment {
         super.onDestroyView();
         SettingActivity.callback = null;
     }
-
-    String getHomeRecName(int type) {
-        switch (type) {
-            case 0:
-                return "豆瓣热播";
-            case 1:
-                return "站点推荐";
-            default:
-                return "关闭";
-        }
-    }
-
 }
